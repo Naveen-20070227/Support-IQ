@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submit Customer Feedback — SupportIQ</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="space-landing">
+
+  <!-- TRANSPARENT NAVBAR -->
+  <header class="saas-navbar-transparent">
+    <div class="saas-container navbar-inner">
+      <a href="/index.html" class="brand-logo-transparent">SupportIQ</a>
+
+      <div class="navbar-actions-right">
+        <span style="color: var(--text-cool-gray); font-size: 0.9rem; margin-right: 0.5rem;">
+          Welcome, <strong id="user-name-display" style="color: #ffffff;">Customer</strong>
+        </span>
+        <button onclick="Auth.logout()" class="btn-register-transparent" style="padding: 0.45rem 1.2rem; cursor: pointer;">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="saas-container" style="padding-top: 2.5rem; padding-bottom: 4rem;">
+    <div style="max-width: 760px; margin: 0 auto;">
+
+      <!-- Submit Feedback Card -->
+      <div class="glass-card" style="margin-bottom: 2.5rem;">
+        <div class="card-header" style="text-align: left; margin-bottom: 1.5rem;">
+          <h1 class="card-title" style="font-size: 1.8rem;">Submit Application Review</h1>
+          <p class="card-subtitle">Tell us about your experience. Your review will be automatically classified using our AI Sentiment Model.</p>
+        </div>
+
+        <div id="feedback-alert" class="alert"></div>
+
+        <form id="feedback-form">
+          <div class="form-group">
+            <label for="feedback-text" class="form-label">Review / Experience Details</label>
+            <textarea 
+              id="feedback-text" 
+              class="form-control" 
+              placeholder="Write your honest review here... (e.g. 'The mobile app interface is super fast, sleek, and easy to navigate! Great job!')" 
+              rows="5"
+              required
+            ></textarea>
+            <div class="form-hint">
+              <span>* Automated AI sentiment prediction is applied instantly upon submission.</span>
+              <span id="char-counter">0 / 2000</span>
+            </div>
+          </div>
+
+          <button type="submit" id="submit-btn" class="btn btn-primary" style="width: 100%;">
+            <span id="submit-btn-spinner" class="spinner" style="display: none;"></span>
+            <span id="submit-btn-text">Submit Review</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- History Card -->
+      <div class="glass-card">
+        <h2 class="card-title" style="font-size: 1.35rem; text-align: left; margin-bottom: 1.25rem;">
+          Your Past Reviews & Predictions
+        </h2>
+        <div id="my-feedback-list" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="empty-state">Loading your review history...</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer style="text-align: center; padding: 2rem 1rem; font-size: 0.85rem; color: var(--text-dim-gray); border-top: 1px solid rgba(255, 255, 255, 0.08);">
+    <p>&copy; 2026 SupportIQ Application • Customer Review Portal</p>
+  </footer>
+
+  <script src="/static/js/auth.js"></script>
+  <script src="/static/js/feedback.js"></script>
+</body>
+</html>

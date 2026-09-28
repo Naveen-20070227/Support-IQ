@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Team Portal — SupportIQ</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="space-landing">
+
+  <!-- TRANSPARENT NAVBAR -->
+  <header class="saas-navbar-transparent">
+    <div class="saas-container navbar-inner">
+      <a href="/index.html" class="brand-logo-transparent">
+        SupportIQ <span style="font-family: var(--font-primary); font-size: 0.8rem; color: var(--accent-cyan); font-weight: 600; letter-spacing: 0.1em; margin-left: 0.5rem; vertical-align: middle;">SUPPORT</span>
+      </a>
+
+      <div class="navbar-actions-right">
+        <a href="/customer-login.html" class="btn-register-transparent">Customer Portal</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="saas-container" style="padding-top: 2rem; padding-bottom: 4rem; display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 82px);">
+    <div class="auth-wrapper" style="width: 100%; max-width: 480px;">
+      <div class="glass-card" style="border-color: rgba(56, 189, 248, 0.25);">
+        <div class="card-header">
+          <h1 class="card-title">Support Team Login</h1>
+          <p class="card-subtitle">Authenticated portal for support staff & analytics dashboard</p>
+        </div>
+
+        <div id="support-login-alert" class="alert"></div>
+
+        <form id="support-login-form" novalidate>
+          <div class="form-group">
+            <label for="email" class="form-label">Support Email</label>
+            <input type="email" id="email" class="form-control" placeholder="support@company.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" id="login-btn" class="btn btn-primary" style="width: 100%; background: var(--support-gradient); margin-top: 1rem;">
+            <span id="login-spinner" class="spinner" style="display: none;"></span>
+            <span id="login-btn-text">Access Support Dashboard</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.825rem; color: var(--text-dim-gray);">
+          Unauthorized access is strictly logged and restricted.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Redirect if already logged in as support
+      const token = Auth.getToken();
+      const user = Auth.getUser();
+      if (token && user && user.role === 'support') {
+        window.location.href = '/dashboard.html';
+        return;
+      }
+
+      const form = document.getElementById('support-login-form');
+      const btn = document.getElementById('login-btn');
+      const btnText = document.getElementById('login-btn-text');
+      const spinner = document.getElementById('login-spinner');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        Auth.hideAlert('support-login-alert');
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) {
+          Auth.showAlert('support-login-alert', 'Please enter Support Team email and password.');
+          return;
+        }
+
+        btn.disabled = true;
+        btnText.textContent = 'Verifying Support Credentials...';
+        spinner.style.display = 'inline-block';
+
+        try {
+          const res = await fetch('/auth/support-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            Auth.showAlert('support-login-alert', data.detail || 'Invalid Support Team credentials.');
+            return;
+          }
+
+          Auth.setAuth(data.access_token, {
+            name: data.name,
+            email: data.email,
+            role: data.role
+          });
+
+          Auth.showAlert('support-login-alert', 'Support authorization granted! Opening dashboard...', 'success');
+          setTimeout(() => {
+            window.location.href = '/dashboard.html';
+          }, 800);
+
+        } catch (err) {
+          console.error(err);
+          Auth.showAlert('support-login-alert', 'Network error connecting to support authentication endpoint.');
+        } finally {
+          btn.disabled = false;
+          btnText.textContent = 'Access Support Dashboard';
+          spinner.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

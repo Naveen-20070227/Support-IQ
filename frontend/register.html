@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Registration — SupportIQ</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="space-landing">
+
+  <!-- TRANSPARENT NAVBAR -->
+  <header class="saas-navbar-transparent">
+    <div class="saas-container navbar-inner">
+      <a href="/index.html" class="brand-logo-transparent">SupportIQ</a>
+
+      <div class="navbar-actions-right">
+        <div class="dropdown-wrapper" id="login-wrapper">
+          <button class="btn-login-text" id="login-dropdown-btn" type="button" aria-haspopup="true" aria-expanded="false">
+            Login <span class="dropdown-caret">▾</span>
+          </button>
+          <div class="dropdown-menu" id="login-dropdown-menu">
+            <a href="/customer-login.html" class="dropdown-item">Customer Login</a>
+            <a href="/support-login.html" class="dropdown-item">Support Login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="saas-container" style="padding-top: 2rem; padding-bottom: 4rem; display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 82px);">
+    <div class="auth-wrapper" style="width: 100%; max-width: 480px;">
+      <div class="glass-card">
+        <div class="card-header">
+          <h1 class="card-title">Create Account</h1>
+          <p class="card-subtitle">Register to submit customer reviews and feedback</p>
+        </div>
+
+        <div id="register-alert" class="alert"></div>
+
+        <form id="register-form" novalidate>
+          <div class="form-group">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" id="name" class="form-control" placeholder="e.g. Jane Doe" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" id="email" class="form-control" placeholder="jane@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+          </div>
+
+          <div class="form-group">
+            <label for="confirm-password" class="form-label">Confirm Password</label>
+            <input type="password" id="confirm-password" class="form-control" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" id="register-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+            <span id="register-spinner" class="spinner" style="display: none;"></span>
+            <span id="register-btn-text">Register Account</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          Already have an account? <a href="/customer-login.html" style="color: var(--accent-cyan); font-weight: 600;">Sign in here</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Navbar dropdown logic
+      const dropdownBtn = document.getElementById('login-dropdown-btn');
+      const dropdownMenu = document.getElementById('login-dropdown-menu');
+      if (dropdownBtn && dropdownMenu) {
+        dropdownBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dropdownMenu.classList.toggle('active');
+        });
+        document.addEventListener('click', () => {
+          dropdownMenu.classList.remove('active');
+        });
+      }
+
+      const form = document.getElementById('register-form');
+      const btn = document.getElementById('register-btn');
+      const btnText = document.getElementById('register-btn-text');
+      const spinner = document.getElementById('register-spinner');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        Auth.hideAlert('register-alert');
+
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (!name || !email || !password || !confirmPassword) {
+          Auth.showAlert('register-alert', 'Please fill in all required fields.');
+          return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          Auth.showAlert('register-alert', 'Please enter a valid email address.');
+          return;
+        }
+
+        if (password.length < 6) {
+          Auth.showAlert('register-alert', 'Password must be at least 6 characters long.');
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          Auth.showAlert('register-alert', 'Passwords do not match. Please verify.');
+          return;
+        }
+
+        btn.disabled = true;
+        btnText.textContent = 'Registering...';
+        spinner.style.display = 'inline-block';
+
+        try {
+          const res = await fetch('/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: name,
+              email: email,
+              password: password,
+              confirm_password: confirmPassword
+            })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            Auth.showAlert('register-alert', data.detail || 'Registration failed.');
+            return;
+          }
+
+          // Auto login user on registration
+          Auth.setAuth(data.access_token, {
+            name: data.name,
+            email: data.email,
+            role: data.role
+          });
+
+          Auth.showAlert('register-alert', 'Account created successfully! Auto logging in...', 'success');
+          setTimeout(() => {
+            window.location.href = '/feedback.html';
+          }, 800);
+
+        } catch (err) {
+          console.error(err);
+          Auth.showAlert('register-alert', 'Network error connecting to backend server.');
+        } finally {
+          btn.disabled = false;
+          btnText.textContent = 'Register Account';
+          spinner.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SupportIQ — AI-Powered Customer Feedback & Sentiment Analysis</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="space-landing landing-page">
+
+  <!-- SECTION 1: FULLY TRANSPARENT NAVBAR (SITS DIRECTLY OVER SPACE BACKGROUND) -->
+  <header class="saas-navbar-transparent">
+    <div class="saas-container navbar-inner">
+      <!-- Left: SupportIQ Logo / Wordmark -->
+      <a href="/index.html" class="brand-logo-transparent">SupportIQ</a>
+
+      <!-- Right: Login Text Action & Register Button -->
+      <div class="navbar-actions-right">
+        <!-- Login ▾ FIRST -->
+        <div class="dropdown-wrapper" id="login-wrapper">
+          <button class="btn-login-text" id="login-dropdown-btn" type="button" aria-haspopup="true" aria-expanded="false">
+            Login <span class="dropdown-caret">▾</span>
+          </button>
+          <div class="dropdown-menu" id="login-dropdown-menu">
+            <a href="/customer-login.html" class="dropdown-item">
+              Customer Login
+            </a>
+            <a href="/support-login.html" class="dropdown-item">
+              Support Login
+            </a>
+          </div>
+        </div>
+
+        <!-- Register SECOND -->
+        <a href="/register.html" class="btn-register-transparent">Register</a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- SECTION 2: CINEMATIC SPACE HERO SECTION -->
+  <section class="saas-hero-space">
+    <div class="saas-container hero-grid">
+
+      <!-- LEFT COLUMN: CONTENT -->
+      <div class="hero-left">
+        <!-- Eyebrow -->
+        <div class="hero-eyebrow">AI-POWERED CUSTOMER FEEDBACK</div>
+
+        <!-- Main Headline -->
+        <h1 class="hero-main-title">
+          Every Feedback <span class="title-gradient">Tells a Story.</span>
+        </h1>
+
+        <!-- Secondary Headline -->
+        <h2 class="hero-subtitle">SupportIQ Helps You Understand It.</h2>
+
+        <!-- Description -->
+        <p class="hero-description">
+          Turn customer feedback into clear insights with AI-powered sentiment analysis. Automatically identify what customers love, what needs attention, and where your support team should focus.
+        </p>
+
+        <!-- Sentiment Indicators -->
+        <div class="hero-indicators">
+          <span class="sentiment-badge badge-pos">
+            <span class="badge-dot dot-pos"></span> Positive
+          </span>
+          <span class="indicator-separator">·</span>
+          <span class="sentiment-badge badge-neu">
+            <span class="badge-dot dot-neu"></span> Neutral
+          </span>
+          <span class="indicator-separator">·</span>
+          <span class="sentiment-badge badge-neg">
+            <span class="badge-dot dot-neg"></span> Negative
+          </span>
+        </div>
+
+        <!-- CTA Button -->
+        <div class="hero-cta-wrapper">
+          <a href="/register.html" class="btn-hero-cta">Get Started →</a>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: FLOATING PRODUCT PREVIEW IN SPACE -->
+      <div class="hero-right">
+        <div class="floating-glass-preview">
+          
+          <!-- Top Row Status -->
+          <div class="preview-meta-row">
+            <div class="preview-badge-live">
+              <span class="live-pulse-dot"></span> Live Analysis Engine
+            </div>
+            <span class="preview-metric">1,248 Feedback Analyzed</span>
+          </div>
+
+          <!-- Customer Feedback Card -->
+          <div class="floating-quote-card">
+            <div class="quote-header">
+              <div class="user-tag">
+                <div class="user-avatar-space">SJ</div>
+                <span class="user-name-space">Sarah Jenkins</span>
+              </div>
+            </div>
+            <p class="quote-text">
+              "The new update made the app much easier to use."
+            </p>
+          </div>
+
+          <!-- AI Sentiment Classification Row -->
+          <div class="processing-glass-row">
+            <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-cool-gray);">AI Sentiment Result:</span>
+            <div class="sentiment-result-tag">
+              <span>Sentiment: Positive</span>
+              <span class="confidence-score">(99.2% Score)</span>
+            </div>
+          </div>
+
+          <!-- Auto Insight Action Card -->
+          <div class="floating-insight-box">
+            <div class="insight-tag-header">Auto-Organized: Testimonials</div>
+            <p class="insight-text">
+              <strong>Support Insight:</strong> Positive UI usability review flagged automatically for Support Dashboard & Marketing Testimonials.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Login Dropdown Toggle & Micro-Interactions Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const dropdownBtn = document.getElementById('login-dropdown-btn');
+      const dropdownMenu = document.getElementById('login-dropdown-menu');
+      const wrapper = document.getElementById('login-wrapper');
+
+      if (dropdownBtn && dropdownMenu) {
+        dropdownBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isShown = dropdownMenu.classList.contains('show');
+          dropdownMenu.classList.toggle('show');
+          if (wrapper) wrapper.classList.toggle('active');
+          dropdownBtn.setAttribute('aria-expanded', !isShown);
+        });
+
+        document.addEventListener('click', () => {
+          dropdownMenu.classList.remove('show');
+          if (wrapper) wrapper.classList.remove('active');
+          dropdownBtn.setAttribute('aria-expanded', 'false');
+        });
+      }
+    });
+  </script>
+</body>
+</html>

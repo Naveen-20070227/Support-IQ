@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Login — SupportIQ</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="space-landing">
+
+  <!-- TRANSPARENT NAVBAR -->
+  <header class="saas-navbar-transparent">
+    <div class="saas-container navbar-inner">
+      <a href="/index.html" class="brand-logo-transparent">SupportIQ</a>
+
+      <div class="navbar-actions-right">
+        <a href="/register.html" class="btn-register-transparent">Register</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="saas-container" style="padding-top: 2rem; padding-bottom: 4rem; display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 82px);">
+    <div class="auth-wrapper" style="width: 100%; max-width: 480px;">
+      <div class="glass-card">
+        <div class="card-header">
+          <h1 class="card-title">Customer Login</h1>
+          <p class="card-subtitle">Welcome back! Sign in to submit customer feedback</p>
+        </div>
+
+        <div id="login-alert" class="alert"></div>
+
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" id="email" class="form-control" placeholder="customer@example.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" id="login-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+            <span id="login-spinner" class="spinner" style="display: none;"></span>
+            <span id="login-btn-text">Sign In</span>
+          </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          Don't have an account? <a href="/register.html" style="color: var(--accent-cyan); font-weight: 600;">Register here</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Redirect if already logged in as customer
+      const token = Auth.getToken();
+      const user = Auth.getUser();
+      if (token && user && user.role === 'customer') {
+        window.location.href = '/feedback.html';
+        return;
+      }
+
+      const form = document.getElementById('login-form');
+      const btn = document.getElementById('login-btn');
+      const btnText = document.getElementById('login-btn-text');
+      const spinner = document.getElementById('login-spinner');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        Auth.hideAlert('login-alert');
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) {
+          Auth.showAlert('login-alert', 'Please enter your email and password.');
+          return;
+        }
+
+        btn.disabled = true;
+        btnText.textContent = 'Authenticating...';
+        spinner.style.display = 'inline-block';
+
+        try {
+          const res = await fetch('/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            Auth.showAlert('login-alert', data.detail || 'Invalid email or password.');
+            return;
+          }
+
+          // Save Auth
+          Auth.setAuth(data.access_token, {
+            name: data.name,
+            email: data.email,
+            role: data.role
+          });
+
+          Auth.showAlert('login-alert', 'Login successful! Redirecting...', 'success');
+          setTimeout(() => {
+            window.location.href = '/feedback.html';
+          }, 800);
+
+        } catch (err) {
+          console.error(err);
+          Auth.showAlert('login-alert', 'Network error connecting to authentication service.');
+        } finally {
+          btn.disabled = false;
+          btnText.textContent = 'Sign In';
+          spinner.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
