@@ -53,7 +53,9 @@ async def lifespan(app: FastAPI):
     init_support_account()
 
     # 3. Load ML model into memory ONCE
-    model_path = os.getenv("MODEL_PATH", "ml/model/sentiment_pipeline.joblib")
+    model_path = os.getenv("MODEL_PATH", "models/sentiment_classifier.joblib")
+    if not os.path.exists(model_path):
+        model_path = os.path.join("ml", "model", "sentiment_classifier.joblib")
     sentiment_service.load_model(model_path)
 
     yield
